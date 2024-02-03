@@ -1,7 +1,6 @@
 
 BUILDDIR := build
 
-XDC := Nexys-A7-100T.xdc
 
 DEVICE := xc7a100t_test
 BITSTREAM_DEVICE := artix7
@@ -12,7 +11,8 @@ SOURCES := top.v
 
 TOP := top
 
-XDC_CMD := -x ../${XDC}
+XDC := ${TOP}.xdc
+XDC_CMD := -x ${XDC}
 
 # Build design
 all: ${BUILDDIR}/${TOP}.bit
@@ -23,7 +23,7 @@ ${BUILDDIR}:
 ${BUILDDIR}/${TOP}.v: src/main.rs src/nexys_a7.rs | ${BUILDDIR}
 	cargo run
 
-${BUILDDIR}/${TOP}.eblif: ${BUILDDIR}/${SOURCES} ${XDC} ${SDC} ${PCF} | ${BUILDDIR}
+${BUILDDIR}/${TOP}.eblif: ${BUILDDIR}/${SOURCES} ${BUILDDIR}/${XDC} ${SDC} ${PCF} | ${BUILDDIR}
 	cd ${BUILDDIR} && symbiflow_synth -t ${TOP} ${SURELOG_OPT} -v ${SOURCES} -d ${BITSTREAM_DEVICE} -p ${PARTNAME} ${XDC_CMD}
 
 ${BUILDDIR}/${TOP}.net: ${BUILDDIR}/${TOP}.eblif

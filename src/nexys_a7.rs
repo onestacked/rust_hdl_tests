@@ -5,7 +5,16 @@ pub mod pins {
 
     pub fn clock() -> Signal<In, Clock> {
         let mut x = Signal::<In, _>::default();
-        x.add_location(0, "P7");
+        x.add_location(0, "E3");
+        x.add_signal_type(0, SignalType::LowVoltageCMOS_3v3);
+        x.add_constraint(PinConstraint {
+            index: 0,
+            constraint: Constraint::Timing(Periodic(PeriodicTiming {
+                net: "sys_clk_pin".into(),
+                period_nanoseconds: 10.0,
+                duty_cycle: 50.0,
+            })),
+        });
         x.connect();
         x
     }
@@ -20,6 +29,7 @@ pub mod pins {
         .enumerate()
         {
             x.add_location(ndx, uname);
+            x.add_signal_type(ndx, SignalType::LowVoltageCMOS_3v3);
         }
         x
     }
@@ -33,6 +43,11 @@ pub mod pins {
         .enumerate()
         {
             x.add_location(ndx, uname);
+            if ndx == 8 || ndx == 9 {
+                x.add_signal_type(ndx, SignalType::LowVoltageCMOS_1v8);
+            } else {
+                x.add_signal_type(ndx, SignalType::LowVoltageCMOS_3v3);
+            }
         }
         x
     }

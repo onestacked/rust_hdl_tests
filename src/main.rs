@@ -1,5 +1,5 @@
 use nexys_a7::{pins, CLOCK_SPEED_100MHZ};
-use rust_hdl::prelude::*;
+use rust_hdl::{fpga::toolchains::vivado::generate_xdc, prelude::*};
 use std::{fs::File, io::Write, time::Duration};
 mod nexys_a7;
 
@@ -7,6 +7,7 @@ mod nexys_a7;
 pub struct Blinky {
     pulser: Pulser,
     clock: Signal<In, Clock>,
+    sw: Signal<In, Bits<16>>,
     leds: Signal<Out, Bits<16>>,
 }
 impl Logic for Blinky {
@@ -14,9 +15,9 @@ impl Logic for Blinky {
     fn update(&mut self) {
         self.pulser.enable.next = true;
         self.pulser.clock.next = self.clock.val();
-        self.leds.next = 0x00.into();
+        self.leds.next = 0x00 ^ self.sw.val();
         if self.pulser.pulse.val() {
-            self.leds.next = 0xAAAA.into();
+            self.leds.next = 0xAAAA ^ self.sw.val();
         }
     }
 }
@@ -28,6 +29,7 @@ impl Default for Blinky {
             pulser,
             clock: pins::clock(),
             leds: pins::leds(),
+            sw: pins::switches(),
         }
     }
 }
@@ -43,11 +45,11 @@ fn build() {
     //synth::generate_bitstream(uut, "firmware/blinky")
     uut.connect_all();
     let vlog = generate_verilog(&uut);
-    let mut out = File::create("build/top.v").unwrap();
-    out.write_all(vlog.as_bytes());
+    let mut verilog = File::create("build/top.v").unwrap();
+    verilog.write_all(vlog.as_bytes());
 
-    // TODO: Build xdc
-    //println!("{vlog}")
+    let mut xdc = File::create("build/top.xdc").unwrap();
+    xdc.write_all(generate_xdc(&uut).as_bytes());
 }
 
 #[allow(unused)]
