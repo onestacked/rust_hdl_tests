@@ -19,6 +19,14 @@ pub mod pins {
         x
     }
 
+    pub fn cpu_resetn() -> Signal<In, Bit> {
+        let mut x = Signal::<In, _>::default();
+        x.add_location(0, "C12");
+        x.add_signal_type(0, SignalType::LowVoltageCMOS_3v3);
+        x.connect();
+        x
+    }
+
     pub fn leds() -> Signal<Out, Bits<16>> {
         let mut x = Signal::<Out, _>::default();
         for (ndx, uname) in [
@@ -27,6 +35,45 @@ pub mod pins {
         ]
         .iter()
         .enumerate()
+        {
+            x.add_location(ndx, uname);
+            x.add_signal_type(ndx, SignalType::LowVoltageCMOS_3v3);
+        }
+        x
+    }
+    pub fn rgb_led16() -> Signal<Out, Bits<3>> {
+        let mut x = Signal::<Out, _>::default();
+        for (ndx, uname) in ["N15", "M16", "R12"].iter().enumerate() {
+            x.add_location(ndx, uname);
+            x.add_signal_type(ndx, SignalType::LowVoltageCMOS_3v3);
+        }
+        x
+    }
+    pub fn rgb_led17() -> Signal<Out, Bits<3>> {
+        let mut x = Signal::<Out, _>::default();
+        for (ndx, uname) in ["G14", "R11", "N16"].iter().enumerate() {
+            x.add_location(ndx, uname);
+            x.add_signal_type(ndx, SignalType::LowVoltageCMOS_3v3);
+        }
+        x
+    }
+
+    pub fn seven_seg_cath() -> Signal<Out, Bits<8>> {
+        let mut x = Signal::<Out, _>::default();
+        for (ndx, uname) in ["T10", "R10", "K16", "K13", "P15", "T11", "L18", "H15"]
+            .iter()
+            .enumerate()
+        {
+            x.add_location(ndx, uname);
+            x.add_signal_type(ndx, SignalType::LowVoltageCMOS_3v3);
+        }
+        x
+    }
+    pub fn seven_seg_anodes() -> Signal<Out, Bits<8>> {
+        let mut x = Signal::<Out, _>::default();
+        for (ndx, uname) in ["J17", "J18", "T9", "J14", "P14", "T14", "K2", "U13"]
+            .iter()
+            .enumerate()
         {
             x.add_location(ndx, uname);
             x.add_signal_type(ndx, SignalType::LowVoltageCMOS_3v3);

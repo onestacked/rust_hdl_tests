@@ -7,7 +7,9 @@ BITSTREAM_DEVICE := artix7
 PARTNAME := xc7a100tcsg324-1
 OFL_BOARD := nexys_a7_100
 
-SOURCES := top.v
+SOURCE := top.v
+
+RS_SOURCES := src/main.rs src/nexys_a7.rs src/blinky.rs src/counter.rs
 
 TOP := top
 
@@ -20,11 +22,11 @@ all: ${BUILDDIR}/${TOP}.bit
 ${BUILDDIR}:
 	mkdir -p ${BUILDDIR}
 
-${BUILDDIR}/${TOP}.v: src/main.rs src/nexys_a7.rs | ${BUILDDIR}
-	cargo run
+${BUILDDIR}/${TOP}.v: ${RS_SOURCES} | ${BUILDDIR}
+	cargo run build
 
-${BUILDDIR}/${TOP}.eblif: ${BUILDDIR}/${SOURCES} ${BUILDDIR}/${XDC} ${SDC} ${PCF} | ${BUILDDIR}
-	cd ${BUILDDIR} && symbiflow_synth -t ${TOP} ${SURELOG_OPT} -v ${SOURCES} -d ${BITSTREAM_DEVICE} -p ${PARTNAME} ${XDC_CMD}
+${BUILDDIR}/${TOP}.eblif: ${BUILDDIR}/${TOP}.v ${BUILDDIR}/${XDC} ${SDC} ${PCF} | ${BUILDDIR}
+	cd ${BUILDDIR} && symbiflow_synth -t ${TOP} ${SURELOG_OPT} -v ${TOP}.v -d ${BITSTREAM_DEVICE} -p ${PARTNAME} ${XDC_CMD}
 
 ${BUILDDIR}/${TOP}.net: ${BUILDDIR}/${TOP}.eblif
 	cd ${BUILDDIR} && symbiflow_pack -e ${TOP}.eblif -d ${DEVICE} ${SDC_CMD} 2>&1 > /dev/null
